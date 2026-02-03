@@ -1,0 +1,1279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>College Athlete Fuel Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!-- Markdown Parser for AI responses -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f8fafc; /* Slate 50 */
+            color: #1e293b; /* Slate 800 */
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .card {
+            background-color: white;
+            border-radius: 0.75rem; /* rounded-xl */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            padding: 1.5rem;
+            transition: transform 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+        }
+        .btn-primary {
+            background-color: #2563eb; /* Blue 600 */
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: background-color 0.2s;
+        }
+        .btn-primary:hover {
+            background-color: #1d4ed8; /* Blue 700 */
+        }
+        .btn-outline {
+            border: 2px solid #2563eb;
+            color: #2563eb;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            background-color: white;
+            transition: all 0.2s;
+        }
+        .btn-outline:hover, .btn-outline.active {
+            background-color: #2563eb;
+            color: white;
+        }
+        .highlight-text {
+            color: #f97316; /* Orange 500 */
+            font-weight: bold;
+        }
+        .season-btn {
+            border: 2px solid #e2e8f0;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #64748b;
+            transition: all 0.2s;
+        }
+        .season-btn:hover {
+            border-color: #cbd5e1;
+        }
+        .season-btn.active {
+            background-color: #eff6ff;
+            border-color: #2563eb;
+            color: #2563eb;
+        }
+        /* Range Slider Styling */
+        input[type=range] {
+            -webkit-appearance: none; 
+            width: 100%; 
+            background: transparent; 
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background: #2563eb;
+            cursor: pointer;
+            margin-top: -8px; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: #cbd5e1;
+            border-radius: 2px;
+        }
+        .whatsapp-float {
+            position: fixed;
+            width: 60px;
+            height: 60px;
+            bottom: 40px;
+            right: 40px;
+            background-color: #25d366;
+            color: #FFF;
+            border-radius: 50px;
+            text-align: center;
+            font-size: 30px;
+            box-shadow: 2px 2px 3px #999;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s;
+        }
+        .whatsapp-float:hover {
+            transform: scale(1.1);
+            background-color: #20ba5a;
+        }
+        .day-card {
+            background: #f1f5f9;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+        }
+        .day-card.active-day {
+            background: #dbeafe;
+            border: 2px solid #2563eb;
+        }
+        .day-card h5 {
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: #64748b;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+        .day-card p {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+        /* Custom Checkbox */
+        .task-checkbox {
+            appearance: none;
+            background-color: #1e293b;
+            margin: 0;
+            font: inherit;
+            color: currentColor;
+            width: 1.5em;
+            height: 1.5em;
+            border: 2px solid #cbd5e1;
+            border-radius: 0.25em;
+            display: grid;
+            place-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .task-checkbox::before {
+            content: "";
+            width: 0.85em;
+            height: 0.85em;
+            transform: scale(0);
+            transition: 120ms transform ease-in-out;
+            box-shadow: inset 1em 1em white;
+            transform-origin: center;
+            clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+        }
+        .task-checkbox:checked {
+            background-color: #22c55e;
+            border-color: #22c55e;
+        }
+        .task-checkbox:checked::before {
+            transform: scale(1);
+        }
+        /* Loading Animation */
+        .typing-indicator span {
+            animation: blink 1.4s infinite both;
+            height: 5px;
+            width: 5px;
+            background: #3b82f6;
+            border-radius: 50%;
+            display: inline-block;
+            margin: 0 1px;
+        }
+        .typing-indicator span:nth-child(2) { animation-delay: .2s; }
+        .typing-indicator span:nth-child(3) { animation-delay: .4s; }
+        @keyframes blink { 0% { opacity: .1; } 20% { opacity: 1; } 100% { opacity: .1; } }
+        
+        /* Markdown Styles for AI Output */
+        .prose p { margin-bottom: 0.5em; }
+        .prose ul { list-style-type: disc; margin-left: 1.2em; margin-bottom: 0.5em; }
+        .prose strong { color: #1e293b; font-weight: 700; }
+    </style>
+</head>
+<body class="pb-24">
+
+    <!-- Navigation / Header -->
+    <nav class="bg-slate-900 text-white sticky top-0 z-50 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <span class="text-2xl mr-2">⚡</span>
+                    <span class="font-bold text-xl tracking-tight text-white">College Athlete Fuel Hub</span>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="#checkin" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-slate-700 text-orange-400">Daily Tracker</a>
+                        <a href="#calculator" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-slate-700">The Lab</a>
+                        <a href="#training" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-slate-700">Training</a>
+                        <a href="#groceries" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-slate-700">Groceries</a>
+                        <a href="#aicoach" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-slate-700 text-blue-400">AI Coach</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- WhatsApp Button -->
+    <a href="https://wa.me/13166509934" class="whatsapp-float" target="_blank" title="Chat with Coach">
+        <i class="ph-fill ph-whatsapp-logo"></i>
+    </a>
+
+    <!-- Hero Section -->
+    <div class="bg-white border-b border-slate-200">
+        <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8 text-center">
+            <h1 class="text-4xl font-extrabold text-slate-900 sm:text-5xl sm:tracking-tight lg:text-6xl">
+                High Performance on a <span class="text-blue-600">Student Budget</span>
+            </h1>
+            <p class="mt-5 max-w-xl mx-auto text-xl text-slate-500">
+                Fueling strategies & programs for fat loss, muscle gain, and explosive performance.
+            </p>
+        </div>
+    </div>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-16">
+
+        <!-- PART 0: DAILY PERFORMANCE TRACKER -->
+        <section id="checkin" class="scroll-mt-24">
+            <div class="card bg-gradient-to-br from-slate-900 to-slate-800 text-white border-none shadow-2xl">
+                <div class="p-6 md:p-8">
+                    <div class="flex items-center justify-between mb-8 border-b border-slate-700 pb-4">
+                        <h2 class="text-2xl font-bold flex items-center">
+                            <i class="ph-fill ph-check-square mr-3 text-green-500"></i> Daily Performance Tracker
+                        </h2>
+                        <span class="text-xs font-bold bg-green-600 text-white px-3 py-1 rounded-full uppercase tracking-wide">Live Score</span>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                        
+                        <!-- COLUMN 1: TO-DO LIST & BIOMETRICS -->
+                        <div class="space-y-8">
+                            
+                            <!-- Key Habits -->
+                            <div class="bg-slate-800/50 p-6 rounded-xl border border-slate-700">
+                                <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">Today's Targets</h3>
+                                <div class="space-y-4">
+                                    <label class="flex items-center justify-between cursor-pointer group p-3 hover:bg-slate-700 rounded-lg transition">
+                                        <div class="flex items-center">
+                                            <div class="bg-blue-500/20 p-2 rounded-lg mr-4 text-blue-400"><i class="ph-fill ph-barbell text-xl"></i></div>
+                                            <div>
+                                                <span class="font-bold block group-hover:text-blue-400 transition">Training Completed</span>
+                                                <span class="text-xs text-slate-400">Did you get better today?</span>
+                                            </div>
+                                        </div>
+                                        <input type="checkbox" id="check-train" class="task-checkbox" onchange="calculateDailyScore()">
+                                    </label>
+
+                                    <label class="flex items-center justify-between cursor-pointer group p-3 hover:bg-slate-700 rounded-lg transition">
+                                        <div class="flex items-center">
+                                            <div class="bg-green-500/20 p-2 rounded-lg mr-4 text-green-400"><i class="ph-fill ph-fork-knife text-xl"></i></div>
+                                            <div>
+                                                <span class="font-bold block group-hover:text-green-400 transition">Hit Macro Goals</span>
+                                                <span class="text-xs text-slate-400">Protein, Carbs & Fats on point.</span>
+                                            </div>
+                                        </div>
+                                        <input type="checkbox" id="check-macros" class="task-checkbox" onchange="calculateDailyScore()">
+                                    </label>
+
+                                    <label class="flex items-center justify-between cursor-pointer group p-3 hover:bg-slate-700 rounded-lg transition">
+                                        <div class="flex items-center">
+                                            <div class="bg-blue-300/20 p-2 rounded-lg mr-4 text-blue-300"><i class="ph-fill ph-drop text-xl"></i></div>
+                                            <div>
+                                                <span class="font-bold block group-hover:text-blue-300 transition">Hydration Goal</span>
+                                                <span class="text-xs text-slate-400">Hit your daily water target.</span>
+                                            </div>
+                                        </div>
+                                        <input type="checkbox" id="check-water" class="task-checkbox" onchange="calculateDailyScore()">
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Readiness Sliders -->
+                            <div class="space-y-6 px-2">
+                                <div>
+                                    <div class="flex justify-between mb-2">
+                                        <label class="text-sm font-bold text-slate-400">Stress Level</label>
+                                        <span id="val-stress" class="text-white font-mono font-bold">5</span>
+                                    </div>
+                                    <input type="range" min="1" max="10" value="5" id="input-stress" class="accent-orange-500" oninput="updateCheckinVal('stress'); calculateDailyScore()">
+                                </div>
+                                <div>
+                                    <div class="flex justify-between mb-2">
+                                        <label class="text-sm font-bold text-slate-400">Soreness</label>
+                                        <span id="val-sore" class="text-white font-mono font-bold">5</span>
+                                    </div>
+                                    <input type="range" min="1" max="10" value="5" id="input-sore" class="accent-red-500" oninput="updateCheckinVal('sore'); calculateDailyScore()">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-bold text-slate-400 mb-2">Hours Slept</label>
+                                    <div class="flex items-center">
+                                        <button onclick="adjustSleep(-0.5)" class="w-10 h-10 rounded-l bg-slate-700 hover:bg-slate-600 font-bold">-</button>
+                                        <input type="number" id="input-sleeph" value="7.5" class="w-full h-10 bg-slate-800 text-center border-none focus:ring-0 font-mono text-white" readonly>
+                                        <button onclick="adjustSleep(0.5)" class="w-10 h-10 rounded-r bg-slate-700 hover:bg-slate-600 font-bold">+</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- COLUMN 2: SCOREBOARD & CHART -->
+                        <div class="bg-slate-800 rounded-xl p-6 border border-slate-700 flex flex-col justify-between">
+                            
+                            <div class="text-center mb-8">
+                                <h4 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-2">Today's Athlete Score</h4>
+                                <div class="relative inline-block">
+                                    <span id="daily-score" class="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-blue-500">0%</span>
+                                </div>
+                                <p id="score-msg" class="text-sm text-slate-400 mt-2">Log your data to see your score.</p>
+                            </div>
+
+                            <div class="h-48 w-full mb-6">
+                                <canvas id="consistencyChart"></canvas>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-3">
+                                <button onclick="generateReport()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 rounded-lg shadow-lg transition flex items-center justify-center text-sm">
+                                    <i class="ph-bold ph-copy mr-2"></i> Copy Log
+                                </button>
+                                <button onclick="getRecoveryAdvice()" id="btn-ai-recovery" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold py-3 rounded-lg shadow-lg transition flex items-center justify-center text-sm group">
+                                    <i class="ph-fill ph-sparkle mr-2"></i> Analyze
+                                </button>
+                            </div>
+                            
+                            <!-- AI Feedback Container -->
+                            <div id="ai-recovery-output" class="hidden mt-4 p-4 bg-indigo-900/50 rounded-lg border border-indigo-500/30 text-sm text-indigo-100 animate-fade-in">
+                                <!-- AI Content Goes Here -->
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PART 1: The Fuel Lab (Calculator) -->
+        <section id="calculator" class="scroll-mt-20">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-slate-900">🧮 Part 1: The Fuel Lab</h2>
+                <p class="mt-2 text-slate-600">Calculate your needs based on your specific goal.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Input Panel -->
+                <div class="card lg:col-span-1 bg-slate-50 border border-slate-200">
+                    <h3 class="text-xl font-bold mb-4 text-slate-800">Athlete Stats</h3>
+                    <div class="space-y-4">
+                        
+                        <!-- GOAL SELECTOR -->
+                        <div class="bg-blue-50 p-4 rounded-lg border border-blue-200 shadow-sm">
+                            <label class="block text-xs font-bold text-blue-600 uppercase mb-2">Primary Goal</label>
+                            <select id="goal-select" class="w-full rounded-md border-gray-300 py-2 text-sm font-semibold" onchange="updateCalculator()">
+                                <option value="maintain">⚡ Maintain / Performance</option>
+                                <option value="loss">🔥 Fat Loss (Deficit)</option>
+                                <option value="gain">💪 Muscle Gain (Surplus)</option>
+                            </select>
+                            <p class="text-xs text-blue-500 mt-2">Changes your TDEE and Grocery List.</p>
+                        </div>
+
+                        <!-- Basic Stats -->
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 uppercase">Gender</label>
+                                <select id="gender" class="w-full mt-1 rounded-md border-gray-300 py-2 text-sm" onchange="updateCalculator()">
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 uppercase">Age</label>
+                                <input type="number" id="age" class="w-full mt-1 rounded-md border-gray-300 py-2 text-sm pl-2" value="20" oninput="updateCalculator()">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase">Bodyweight (lbs)</label>
+                            <input type="number" id="weight" class="w-full mt-1 rounded-md border-gray-300 py-2 pl-2 text-lg font-bold text-blue-600" value="180" oninput="updateCalculator()">
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 uppercase">Height (Ft)</label>
+                                <input type="number" id="height-ft" class="w-full mt-1 rounded-md border-gray-300 py-2 pl-2" value="5" oninput="updateCalculator()">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 uppercase">Height (In)</label>
+                                <input type="number" id="height-in" class="w-full mt-1 rounded-md border-gray-300 py-2 pl-2" value="10" oninput="updateCalculator()">
+                            </div>
+                        </div>
+
+                        <!-- Activity Levels -->
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Daily Activity (School/Work)</label>
+                            <select id="daily-activity" class="w-full rounded-md border-gray-300 py-2 text-sm" onchange="updateCalculator()">
+                                <option value="1.2">Sedentary (Desk Job/Student)</option>
+                                <option value="1.375">Light Active (Walking/Standing)</option>
+                                <option value="1.55">Active (Physical Job)</option>
+                            </select>
+                        </div>
+                         <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Training Frequency</label>
+                            <select id="training-freq" class="w-full rounded-md border-gray-300 py-2 text-sm" onchange="updateCalculator()">
+                                <option value="0">Rest / Injured (0 days)</option>
+                                <option value="0.1">Light Training (1-2 days)</option>
+                                <option value="0.2">Moderate Training (3-5 days)</option>
+                                <option value="0.3">Heavy Training (6-7 days)</option>
+                                <option value="0.4">Two-a-Days / Elite</option>
+                            </select>
+                        </div>
+
+                        <!-- Season Selector -->
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Periodization Phase</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button id="btn-pre" class="season-btn active" onclick="setSeason('pre')">Pre-Season</button>
+                                <button id="btn-in" class="season-btn" onclick="setSeason('in')">In-Season</button>
+                                <button id="btn-post" class="season-btn" onclick="setSeason('post')">Post-Season</button>
+                                <button id="btn-off" class="season-btn" onclick="setSeason('off')">Off-Season</button>
+                            </div>
+                            <p class="text-xs text-slate-500 mt-2 italic" id="season-desc">High volume. Focus on Carb loading.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6 bg-blue-50 p-4 rounded-lg">
+                        <div class="flex justify-between items-center">
+                             <h4 class="font-bold text-blue-800 text-sm uppercase">Hydration Goal</h4>
+                             <span class="text-xs text-blue-400">1/2 Bodyweight Rule</span>
+                        </div>
+                        <p class="text-3xl font-extrabold text-blue-600 mt-1"><span id="water-oz">90</span> <span class="text-lg font-normal text-blue-500">oz</span></p>
+                    </div>
+                </div>
+
+                <!-- Results & Chart -->
+                <div class="card lg:col-span-2">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 h-full">
+                        <!-- Numeric Results -->
+                        <div class="flex flex-col justify-center space-y-4">
+                            <div class="bg-slate-100 p-4 rounded-lg border-l-4 border-slate-500 mb-2 relative">
+                                <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wide">Daily Target</h4>
+                                <div class="flex items-baseline">
+                                    <span class="text-4xl font-extrabold text-slate-900" id="tdee-val">2800</span>
+                                    <span class="ml-2 text-sm text-slate-500">kcal/day</span>
+                                </div>
+                                <div id="goal-badge" class="absolute top-4 right-4 text-xs font-bold bg-blue-100 text-blue-700 px-2 py-1 rounded">MAINTENANCE</div>
+                            </div>
+
+                            <div>
+                                <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wide">Protein (Repair)</h4>
+                                <div class="flex items-baseline">
+                                    <span class="text-2xl font-bold text-slate-900" id="protein-range">180</span>
+                                    <span class="ml-2 text-sm text-slate-500">g</span>
+                                </div>
+                                <p class="text-xs text-slate-400">1.0g per lb (Target)</p>
+                            </div>
+                            <div>
+                                <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wide">Fats (Hormones)</h4>
+                                <div class="flex items-baseline">
+                                    <span class="text-2xl font-bold text-slate-900" id="fat-range">80</span>
+                                    <span class="ml-2 text-sm text-slate-500">g</span>
+                                </div>
+                                <p class="text-xs text-slate-400">~0.4g per lb (Min threshold)</p>
+                            </div>
+                            <div>
+                                <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wide">Carbs (Energy)</h4>
+                                <div class="flex items-baseline">
+                                    <span class="text-2xl font-bold text-orange-600 highlight-text" id="carb-range">340</span>
+                                    <span class="ml-2 text-sm text-slate-500">g</span>
+                                </div>
+                                <p class="text-xs text-slate-400">Fills remaining energy needs</p>
+                            </div>
+                        </div>
+
+                        <!-- Visualization -->
+                        <div class="flex flex-col items-center justify-center">
+                            <h4 class="text-sm font-bold text-slate-400 mb-4">Daily Calorie Budget</h4>
+                            <div class="chart-container" style="height: 250px;">
+                                <canvas id="macroChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PART 2: TRAINING PROGRAMS -->
+        <section id="training" class="scroll-mt-20">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-slate-900">🏋️ Part 2: Training Splits</h2>
+                <p class="mt-2 text-slate-600">Select a program that matches your current season and availability.</p>
+            </div>
+
+            <div class="card p-6">
+                <!-- Program Selector -->
+                <div class="flex flex-col md:flex-row justify-center gap-4 mb-8">
+                    <div class="w-full md:w-1/2">
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Select Program Focus</label>
+                        <select id="training-select" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 py-2 px-3 bg-slate-50" onchange="updateTraining()">
+                            <option value="offseason">💪 Off-Season: Strength & Power (4 Days)</option>
+                            <option value="inseason">⚡ In-Season: Maintenance & Speed (3 Days)</option>
+                            <option value="busy">📚 Busy Student: Hybrid Split (3 Days)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Program Display -->
+                <div class="bg-white rounded-lg">
+                    <div class="mb-6 text-center">
+                        <h3 class="text-xl font-bold text-blue-700" id="program-title">Off-Season Strength</h3>
+                        <p class="text-sm text-slate-500" id="program-desc">High intensity, moderate volume. Focus on Hypertrophy and Base Strength.</p>
+                    </div>
+
+                    <!-- Weekly Grid -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3" id="program-grid">
+                        <!-- Filled by JS -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <hr class="border-slate-200 mt-16">
+
+        <!-- PART 3: Grocery Lists -->
+        <section id="groceries" class="scroll-mt-20">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-slate-900">🛒 Part 3: The Grocery Game Plan</h2>
+                <p class="mt-2 text-slate-600">Dynamic lists based on your Budget, Store, and Goal.</p>
+            </div>
+
+            <!-- Controls -->
+            <div class="flex flex-col md:flex-row justify-center gap-4 mb-8">
+                <div class="w-full md:w-64">
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Budget Tier</label>
+                    <select id="budget-select" class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md" onchange="updateGroceryList()">
+                        <option value="survival">📉 Survival Mode ($50-$60)</option>
+                        <option value="performance">📈 Performance Optimized ($100-$120)</option>
+                    </select>
+                </div>
+                <div class="w-full md:w-64">
+                    <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Store Preference</label>
+                    <select id="store-select" class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md" onchange="updateGroceryList()">
+                        <!-- Options populated by JS based on Budget -->
+                    </select>
+                </div>
+            </div>
+
+            <!-- Grocery Display -->
+            <div class="card bg-white border border-slate-200 shadow-xl overflow-hidden">
+                <div class="bg-slate-900 px-6 py-4 flex justify-between items-center">
+                    <h3 class="text-white font-bold text-lg" id="list-title">Walmart Volume Haul</h3>
+                    <div class="flex items-center space-x-2">
+                        <span class="bg-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full" id="list-cost">~$55.00</span>
+                        <button onclick="getMealIdea()" id="btn-ai-meal" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold px-3 py-1 rounded-full flex items-center transition">
+                            <i class="ph-fill ph-magic-wand mr-1"></i> Meal Idea
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- AI Meal Idea Output -->
+                <div id="ai-meal-output" class="hidden bg-indigo-50 px-6 py-4 border-b border-indigo-100 text-sm text-indigo-900">
+                    <!-- AI Content -->
+                </div>
+                
+                <!-- Dynamic Goal Alert Inside List -->
+                <div id="list-goal-alert" class="bg-blue-50 px-6 py-3 border-b border-blue-100 flex items-center text-sm text-blue-800">
+                    <i class="ph-bold ph-info mr-2"></i>
+                    <span id="list-goal-text">Maintenance Mode: Balanced list.</span>
+                </div>
+
+                <div class="p-6 grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- Protein Col -->
+                    <div>
+                        <div class="flex items-center mb-4">
+                            <div class="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center text-red-600 mr-3 text-lg">🥩</div>
+                            <h4 class="font-bold text-slate-800">Protein</h4>
+                        </div>
+                        <ul class="space-y-3 text-sm text-slate-600" id="protein-list">
+                            <!-- Items -->
+                        </ul>
+                    </div>
+                    <!-- Carb Col -->
+                    <div>
+                        <div class="flex items-center mb-4">
+                            <div class="w-8 h-8 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-600 mr-3 text-lg">🌾</div>
+                            <h4 class="font-bold text-slate-800">Carbs</h4>
+                        </div>
+                        <ul class="space-y-3 text-sm text-slate-600" id="carb-list">
+                            <!-- Items -->
+                        </ul>
+                    </div>
+                    <!-- Fats/Veg/Supps Col -->
+                    <div>
+                        <div class="flex items-center mb-4">
+                            <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-600 mr-3 text-lg">🥑</div>
+                            <h4 class="font-bold text-slate-800">Fats, Veg & Extras</h4>
+                        </div>
+                        <ul class="space-y-3 text-sm text-slate-600" id="other-list">
+                            <!-- Items -->
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PART 4: Plate Builder -->
+        <section id="plate" class="scroll-mt-20">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                <!-- Visualizer -->
+                <div>
+                    <h2 class="text-3xl font-bold text-slate-900 mb-4">🍽 Part 4: Visualizing Your Plate</h2>
+                    <p class="text-slate-600 mb-6">Meal timing determines composition. Don't have a scale? Use the visual guide.</p>
+                    
+                    <div class="flex space-x-2 mb-6">
+                        <button class="btn-primary flex-1 text-sm" onclick="setPlate('pre')" id="plate-btn-pre">Pre-Workout</button>
+                        <button class="btn-outline flex-1 text-sm" onclick="setPlate('post')" id="plate-btn-post">Post-Workout</button>
+                        <button class="btn-outline flex-1 text-sm" onclick="setPlate('rest')" id="plate-btn-rest">Rest Days</button>
+                    </div>
+
+                    <div class="card bg-white flex flex-col items-center">
+                        <h3 class="text-lg font-bold text-slate-800 mb-2" id="plate-title">Pre-Workout Fuel</h3>
+                        <p class="text-sm text-slate-500 mb-4 text-center italic" id="plate-desc">Focus on Carbs + Protein (Low Fat). Ex: Oatmeal + Protein Powder.</p>
+                        <div class="chart-container" style="height: 300px;">
+                            <canvas id="plateChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reference Table -->
+                <div class="flex flex-col justify-center">
+                    <div class="bg-blue-900 rounded-xl shadow-lg p-6 text-white">
+                        <h3 class="text-xl font-bold mb-6 border-b border-blue-700 pb-2">The Hand Portion Method</h3>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div class="flex items-start">
+                                <span class="text-4xl mr-3">✋</span>
+                                <div>
+                                    <h4 class="font-bold text-blue-300 uppercase text-xs tracking-wider">Protein</h4>
+                                    <p class="font-bold text-lg">1-2 Palms</p>
+                                    <p class="text-sm text-blue-200">Chicken, Beef, Eggs, Greek Yogurt</p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start">
+                                <span class="text-4xl mr-3">👐</span>
+                                <div>
+                                    <h4 class="font-bold text-yellow-300 uppercase text-xs tracking-wider">Carbs</h4>
+                                    <p class="font-bold text-lg">1-2 Cupped Hands</p>
+                                    <p class="text-sm text-blue-200">Rice, Potatoes, Oats, Fruit</p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start">
+                                <span class="text-4xl mr-3">✊</span>
+                                <div>
+                                    <h4 class="font-bold text-green-300 uppercase text-xs tracking-wider">Veggies</h4>
+                                    <p class="font-bold text-lg">1-2 Fists</p>
+                                    <p class="text-sm text-blue-200">Broccoli, Spinach, Peppers</p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start">
+                                <span class="text-4xl mr-3">👍</span>
+                                <div>
+                                    <h4 class="font-bold text-orange-300 uppercase text-xs tracking-wider">Fats</h4>
+                                    <p class="font-bold text-lg">1-2 Thumbs</p>
+                                    <p class="text-sm text-blue-200">Peanut Butter, Oil, Nuts, Avocado</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PART 5: AI COACH CHAT -->
+        <section id="aicoach" class="scroll-mt-20">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-slate-900">🤖 Coach's Corner (AI)</h2>
+                <p class="mt-2 text-slate-600">Ask nutrition & training questions instantly.</p>
+            </div>
+            
+            <div class="card p-6 bg-slate-900 text-white max-w-3xl mx-auto">
+                <div class="flex items-center mb-4 border-b border-slate-700 pb-3">
+                    <div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center mr-3 font-bold text-xl">B</div>
+                    <div>
+                        <h3 class="font-bold">Coach Bacon (AI)</h3>
+                        <p class="text-xs text-slate-400">NCI Level 1 Certified • Always Online</p>
+                    </div>
+                </div>
+                
+                <div id="chat-output" class="bg-slate-800 rounded-lg p-4 h-64 overflow-y-auto mb-4 text-sm space-y-3">
+                    <div class="text-slate-400 text-center italic mt-20">Ask me about pre-workout meals, recovery, or supplements...</div>
+                </div>
+                
+                <div class="flex gap-2">
+                    <input type="text" id="chat-input" placeholder="Type your question..." class="flex-1 bg-slate-800 border border-slate-700 text-white rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    <button onclick="askCoach()" id="btn-chat-send" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg font-bold transition">
+                        <i class="ph-bold ph-paper-plane-right"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-slate-900 text-slate-400 py-8 mt-12 mb-20">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <p class="font-medium text-lg text-slate-200">Made by Bacon Dao, NCI Level 1 Nutrition Coaching Certified</p>
+        </div>
+    </footer>
+
+    <script>
+        // --- API CONFIGURATION ---
+        const apiKey = ""; // System will inject this
+
+        // --- Data ---
+        // Enhanced grocery data with better items from PDF
+        const groceryData = {
+            survival: {
+                walmart: {
+                    title: "Walmart (The Volume Haul)",
+                    cost: "~$55.00",
+                    protein: ["Frozen Chicken Thighs (3lb bag)", "3 dozen Large Eggs", "4 cans Tuna"],
+                    carbs: ["5lb bag White Rice", "Old Fashioned Oats (large tub)", "5lb Russet Potatoes", "2 bunches Bananas"],
+                    other: ["Peanut Butter (large jar)", "2 bags Frozen Broccoli"]
+                },
+                aldi: {
+                    title: "Aldi (The Efficiency Haul)",
+                    cost: "~$52.00",
+                    protein: ["Family Pack Fresh Chicken Thighs (~5lb)", "2 dozen Eggs", "2lb Ground Beef (80/20)"],
+                    carbs: ["5lb Jasmine Rice", "Bag of Sweet Potatoes", "Box of Oats", "2 bunches Bananas"],
+                    other: ["Bag of Spinach", "Frozen Mixed Veggies", "Peanut Butter"]
+                },
+                dillons: {
+                    title: "Dillons/Kroger (Manager's Special)",
+                    cost: "~$58.00",
+                    protein: ["1 Rotisserie Chicken", "2 dozen Eggs", "1lb Ground Turkey"],
+                    carbs: ["Kroger Brand Pasta (2 boxes)", "5lb Potatoes", "Apples", "Bananas"],
+                    other: ["Plain Greek Yogurt (Tub)", "Frozen '99¢' Veggies"]
+                }
+            },
+            performance: {
+                walmart: {
+                    title: "Walmart (The Optimized Haul)",
+                    cost: "~$118.00",
+                    protein: ["6lb Frozen Chicken Thighs", "5 dozen Eggs", "2lb Lean Ground Beef", "1 Whole Chicken"],
+                    carbs: ["10lb Rice", "Oats", "Potatoes", "Bananas", "Pasta", "Tortillas"],
+                    other: ["Whey Protein Powder (~$22)", "Creatine Monohydrate", "Olive Oil", "Fresh Spinach & Frozen Veggies"]
+                },
+                aldi: {
+                    title: "Aldi (The Quality Haul)",
+                    cost: "~$112.00",
+                    protein: ["3 Family Packs Chicken Thighs", "3 dozen Eggs", "2lb Lean Ground Beef", "Whole Chicken"],
+                    carbs: ["Jasmine Rice", "Sweet Potatoes", "Pasta", "Oats", "Bananas", "Berries (Frozen)"],
+                    other: ["Elevation Whey Protein Powder (~$20)", "Avocados (bag)", "Spinach", "Mixed Nuts"]
+                },
+                costco: {
+                    title: "Costco / Sam's Club (Bulk Foundation)",
+                    cost: "~$120.00 (Stocks 3-4 Weeks)",
+                    protein: ["Frozen Chicken Thighs (10lb bag) ~$22", "Bulk Whey Protein (5lb tub) ~$55"],
+                    carbs: ["Rice (25lb bag) ~$15"],
+                    other: ["Bulk Creatine Monohydrate ~$25", "Frozen Broccoli (4lb bag) ~$9"]
+                }
+            }
+        };
+
+        const goalAddons = {
+            loss: {
+                label: "FAT LOSS FOCUS",
+                desc: "Prioritizing volume and lean protein. Added items:",
+                items: ["Egg Whites (Carton)", "Popcorn (Air popped)", "Extra Frozen Green Beans", "Hot Sauce / Salsa"]
+            },
+            gain: {
+                label: "MUSCLE GAIN FOCUS",
+                desc: "Prioritizing caloric density. Added items:",
+                items: ["Whole Milk", "Bagels / English Muffins", "Olive Oil", "Trail Mix / Dried Fruit"]
+            },
+            maintain: {
+                label: "MAINTENANCE FOCUS",
+                desc: "Standard balanced performance list.",
+                items: []
+            }
+        };
+
+        const trainingPrograms = {
+            offseason: {
+                title: "Off-Season Strength & Power",
+                desc: "High Intensity, Lower Frequency. Focus on building the engine.",
+                days: [
+                    { day: "Mon", focus: "Upper Strength", details: "Bench, Rows, OHP" },
+                    { day: "Tue", focus: "Lower Strength", details: "Squat, RDL, Core" },
+                    { day: "Wed", focus: "Rest / Mobility", details: "Zone 2 Cardio" },
+                    { day: "Thu", focus: "Upper Hypertrophy", details: "DB Press, Pullups, Arms" },
+                    { day: "Fri", focus: "Lower Power", details: "Cleans, Jumps, Lunges" },
+                    { day: "Sat", focus: "Active Recovery", details: "Hiking / Walking" },
+                    { day: "Sun", focus: "Rest", details: "Meal Prep" }
+                ]
+            },
+            inseason: {
+                title: "In-Season Performance",
+                desc: "Low Volume, High Intent. Maintain strength without fatigue.",
+                days: [
+                    { day: "Mon", focus: "Full Body A", details: "Squat, Push, Pull (3x3)" },
+                    { day: "Tue", focus: "Practice", details: "Sport Specific" },
+                    { day: "Wed", focus: "Full Body B", details: "Trap Bar DL, Press, Chinup" },
+                    { day: "Thu", focus: "Practice", details: "Sport Specific" },
+                    { day: "Fri", focus: "Priming", details: "Jumps, Throws, Core" },
+                    { day: "Sat", focus: "GAME DAY", details: "Compete" },
+                    { day: "Sun", focus: "Rest", details: "Sleep & Eat" }
+                ]
+            },
+            busy: {
+                title: "Busy Student Hybrid",
+                desc: "3 Days/Week. Maximum efficiency for busy schedules.",
+                days: [
+                    { day: "Mon", focus: "Upper Body", details: "Push/Pull Supersets" },
+                    { day: "Tue", focus: "Rest", details: "Study" },
+                    { day: "Wed", focus: "Lower Body", details: "Squat/Hinge Patterns" },
+                    { day: "Thu", focus: "Rest", details: "Study" },
+                    { day: "Fri", focus: "Full Body", details: "Athletic Compounds" },
+                    { day: "Sat", focus: "Rest", details: "Social / Recovery" },
+                    { day: "Sun", focus: "Rest", details: "Meal Prep" }
+                ]
+            }
+        };
+
+        const plateConfigs = {
+            pre: { title: "Pre-Workout Fuel", desc: "Focus on Carbs + Protein (Low Fat). Ex: Oatmeal + Protein Powder.", data: [45, 45, 10] },
+            post: { title: "Post-Workout Recovery", desc: "Focus on Carbs + Protein. Ex: Rice + Chicken.", data: [50, 40, 10] },
+            rest: { title: "Rest Days", desc: "Increase Fats, Lower Carbs slightly. Ex: Eggs + Avocado + Fruit.", data: [20, 30, 50] }
+        };
+
+        // --- State ---
+        let currentSeason = 'pre';
+        let currentGoal = 'maintain';
+        let macroHit = false;
+        let macroChartInstance = null;
+        let plateChartInstance = null;
+        let consistencyChartInstance = null;
+
+        const commonTooltip = {
+            callbacks: {
+                title: function(tooltipItems) {
+                    const item = tooltipItems[0];
+                    let label = item.chart.data.labels[item.dataIndex];
+                    if (Array.isArray(label)) {
+                        return label.join(' ');
+                    } else {
+                        return label;
+                    }
+                }
+            }
+        };
+
+        // --- GEMINI AI FUNCTIONS ---
+
+        async function callGemini(promptText) {
+            if (!apiKey) {
+                alert("API Key is missing. Please configure the app environment.");
+                return null;
+            }
+            
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            const payload = {
+                contents: [{ parts: [{ text: promptText }] }],
+                systemInstruction: { parts: [{ text: "You are Bacon Dao, an NCI Level 1 Nutrition Coach for college athletes. You speak in a motivational, direct, and science-based tone. You focus on 'fueling for performance', 'optimizing recovery', and 'budget-friendly' solutions. Keep answers concise." }] }
+            };
+
+            // Simple exponential backoff
+            const delays = [1000, 2000, 4000, 8000, 16000];
+            for (let i = 0; i < 5; i++) {
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    
+                    if (!response.ok) {
+                        if (response.status === 429) {
+                            await new Promise(r => setTimeout(r, delays[i]));
+                            continue;
+                        }
+                        throw new Error(`API Error: ${response.status}`);
+                    }
+                    
+                    const data = await response.json();
+                    return data.candidates?.[0]?.content?.parts?.[0]?.text || "Coach is offline. Try again.";
+                } catch (error) {
+                    if (i === 4) return "Coach Bacon is currently unavailable. Please try again later.";
+                }
+            }
+        }
+
+        async function getRecoveryAdvice() {
+            const btn = document.getElementById('btn-ai-recovery');
+            const outputDiv = document.getElementById('ai-recovery-output');
+            const originalText = btn.innerHTML;
+            
+            // Gather Data
+            const stress = document.getElementById('input-stress').value;
+            const sore = document.getElementById('input-sore').value;
+            const sleep = document.getElementById('input-sleeph').value;
+            const trained = document.getElementById('check-train').checked ? "Yes" : "No";
+            const macros = document.getElementById('check-macros').checked ? "Yes" : "No";
+            
+            // UI Update
+            btn.disabled = true;
+            btn.innerHTML = '<div class="typing-indicator"><span></span><span></span><span></span></div>';
+            outputDiv.classList.remove('hidden');
+            outputDiv.innerHTML = '<p class="animate-pulse">Analyzing biometrics...</p>';
+            
+            // Prompt
+            const prompt = `Analyze this athlete's daily check-in: Stress ${stress}/10, Soreness ${sore}/10, Sleep ${sleep}hrs. Trained Today: ${trained}. Hit Macros: ${macros}. Give specific advice on recovery or mindset for tomorrow based on these stats. Be punchy. Max 3 sentences.`;
+            
+            // Call AI
+            const response = await callGemini(prompt);
+            
+            // Display
+            outputDiv.innerHTML = marked.parse(response);
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
+
+        async function getMealIdea() {
+            const btn = document.getElementById('btn-ai-meal');
+            const outputDiv = document.getElementById('ai-meal-output');
+            const originalText = btn.innerHTML;
+            
+            // Gather Data
+            const store = document.getElementById('store-select').value;
+            const goal = document.getElementById('goal-select').value;
+            const p = document.getElementById('protein-range').textContent;
+            const c = document.getElementById('carb-range').textContent;
+            const f = document.getElementById('fat-range').textContent;
+            
+            // UI Update
+            btn.disabled = true;
+            btn.innerHTML = '...';
+            outputDiv.classList.remove('hidden');
+            outputDiv.innerHTML = '<p class="animate-pulse text-xs">Chef is cooking...</p>';
+            
+            // Prompt
+            const prompt = `Generate ONE simple, high-performance meal idea for a college athlete. Goal: ${goal}. Store: ${store}. Target Macros for day: ${p}g P, ${c}g C, ${f}g F. Format: **Meal Name**\n- Key Ingredients (from that store)\n- Quick Prep Tip. Keep it budget friendly.`;
+            
+            // Call AI
+            const response = await callGemini(prompt);
+            
+            // Display
+            outputDiv.innerHTML = marked.parse(response);
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
+
+        async function askCoach() {
+            const input = document.getElementById('chat-input');
+            const output = document.getElementById('chat-output');
+            const btn = document.getElementById('btn-chat-send');
+            const question = input.value.trim();
+            
+            if (!question) return;
+            
+            // UI Update
+            input.value = "";
+            output.innerHTML += `<div class="text-right mb-2"><span class="bg-blue-600 text-white py-1 px-3 rounded-lg inline-block">${question}</span></div>`;
+            output.scrollTop = output.scrollHeight;
+            btn.disabled = true;
+            
+            // Loading bubble
+            const loadingId = 'loading-' + Date.now();
+            output.innerHTML += `<div id="${loadingId}" class="text-left mb-2"><span class="bg-slate-700 text-slate-300 py-1 px-3 rounded-lg inline-block"><div class="typing-indicator"><span></span><span></span><span></span></div></span></div>`;
+            output.scrollTop = output.scrollHeight;
+            
+            // Call AI
+            const response = await callGemini(question);
+            
+            // Remove loading, add response
+            document.getElementById(loadingId).remove();
+            output.innerHTML += `<div class="text-left mb-2"><div class="bg-slate-700 text-slate-200 py-2 px-3 rounded-lg inline-block prose prose-invert prose-sm max-w-none">${marked.parse(response)}</div></div>`;
+            output.scrollTop = output.scrollHeight;
+            btn.disabled = false;
+        }
+
+        // Allow Enter key in chat
+        document.getElementById('chat-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') askCoach();
+        });
+
+
+        // --- STANDARD APP FUNCTIONS (Preserved) ---
+        
+        function updateCheckinVal(type) {
+            const el = document.getElementById(`input-${type}`);
+            const display = document.getElementById(`val-${type}`);
+            if(el && display) display.textContent = el.value;
+        }
+
+        function adjustSleep(amount) {
+            const input = document.getElementById('input-sleeph');
+            if(!input) return;
+            let val = parseFloat(input.value);
+            val += amount;
+            if(val < 0) val = 0;
+            if(val > 24) val = 24;
+            input.value = val;
+            calculateDailyScore();
+        }
+
+        function calculateDailyScore() {
+            let score = 0;
+            if (document.getElementById('check-train').checked) score += 20;
+            if (document.getElementById('check-macros').checked) score += 30;
+            if (document.getElementById('check-water').checked) score += 10;
+            const sleepHrs = parseFloat(document.getElementById('input-sleeph').value) || 0;
+            if (sleepHrs >= 8) score += 20; else if (sleepHrs >= 6) score += 10;
+            const stress = parseInt(document.getElementById('input-stress').value) || 5;
+            const sore = parseInt(document.getElementById('input-sore').value) || 5;
+            score += (11 - stress); score += (11 - sore);
+            if(score > 100) score = 100;
+            
+            const scoreDisplay = document.getElementById('daily-score');
+            const scoreMsg = document.getElementById('score-msg');
+            scoreDisplay.textContent = score + "%";
+            if(score >= 80) scoreMsg.textContent = "🔥 Crushing it! Elite Level.";
+            else if(score >= 50) scoreMsg.textContent = "👍 Solid day. Keep consistent.";
+            else scoreMsg.textContent = "⚠️ Needs focus. Recovery is key.";
+            updateConsistencyChart(score);
+        }
+
+        function updateConsistencyChart(currentScore) {
+            if (consistencyChartInstance) consistencyChartInstance.destroy();
+            const ctx = document.getElementById('consistencyChart').getContext('2d');
+            const dataPoints = [65, 80, 45, 90, 85, 70, currentScore];
+            const labels = ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6', 'Today'];
+            const colors = dataPoints.map((val, index) => index === 6 ? '#22c55e' : '#64748b');
+            
+            consistencyChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: { labels: labels, datasets: [{ label: 'Daily Readiness Score', data: dataPoints, backgroundColor: colors, borderRadius: 6 }] },
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, max: 100, grid: { color: '#334155' }, ticks: { color: '#94a3b8'} }, x: { grid: { display: false }, ticks: { color: '#94a3b8'} } }, plugins: { legend: { display: false } } }
+            });
+        }
+
+        function generateReport() {
+            const stress = document.getElementById('input-stress').value;
+            const sore = document.getElementById('input-sore').value;
+            const sleepH = document.getElementById('input-sleeph').value;
+            const trained = document.getElementById('check-train').checked ? "YES" : "NO";
+            const macros = document.getElementById('check-macros').checked ? "YES" : "NO";
+            const water = document.getElementById('check-water').checked ? "YES" : "NO";
+            const score = document.getElementById('daily-score').textContent;
+            const date = new Date().toLocaleDateString();
+            const report = `Athlete Check-In (${date})\n------------------\nDaily Score: ${score}\n\n✅ Habits:\n- Trained: ${trained}\n- Hit Macros: ${macros}\n- Hydration: ${water}\n\n📊 Recovery:\n- Stress: ${stress}/10\n- Soreness: ${sore}/10\n- Sleep: ${sleepH} hrs`;
+            
+            const textArea = document.createElement("textarea");
+            textArea.value = report;
+            textArea.style.position = "fixed"; textArea.style.left = "-9999px"; textArea.style.top = "0";
+            document.body.appendChild(textArea);
+            textArea.focus(); textArea.select();
+            
+            try {
+                const successful = document.execCommand('copy');
+                if(successful) alert("Report copied! Ready for WhatsApp.");
+                else prompt("Copy report manually:", report);
+            } catch (err) { prompt("Copy report manually:", report); }
+            document.body.removeChild(textArea);
+        }
+
+        function updateTraining() {
+            const select = document.getElementById('training-select');
+            const programKey = select.value;
+            const program = trainingPrograms[programKey];
+            document.getElementById('program-title').textContent = program.title;
+            document.getElementById('program-desc').textContent = program.desc;
+            const grid = document.getElementById('program-grid');
+            grid.innerHTML = '';
+            program.days.forEach(day => {
+                const div = document.createElement('div');
+                div.className = day.focus.includes('Rest') ? 'day-card' : 'day-card active-day';
+                div.innerHTML = `<h5>${day.day}</h5><p>${day.focus}</p><p class="text-xs text-slate-500 mt-1">${day.details}</p>`;
+                grid.appendChild(div);
+            });
+        }
+
+        function setSeason(season) {
+            currentSeason = season;
+            const btns = ['btn-pre', 'btn-in', 'btn-post', 'btn-off'];
+            btns.forEach(id => {
+                const b = document.getElementById(id);
+                if(b) { b.classList.remove('active', 'bg-blue-600', 'text-white', 'border-blue-600'); b.classList.add('season-btn'); }
+            });
+            const activeBtn = document.getElementById(`btn-${season}`);
+            if(activeBtn) activeBtn.classList.add('active');
+            
+            const desc = document.getElementById('season-desc');
+            if(desc) {
+                if(season === 'pre') desc.textContent = "High volume. Focus on Carb loading.";
+                else if(season === 'in') desc.textContent = "Maintenance & Performance. Balanced high energy.";
+                else if(season === 'post') desc.textContent = "Restoration. Recovering metabolism & tissues.";
+                else if(season === 'off') desc.textContent = "Base building. Hypertrophy or body comp focus.";
+            }
+            updateCalculator();
+        }
+
+        function updateCalculator() {
+            const goalEl = document.getElementById('goal-select');
+            const goal = goalEl ? goalEl.value : 'maintain';
+            currentGoal = goal;
+            
+            const gender = document.getElementById('gender').value;
+            const age = parseFloat(document.getElementById('age').value) || 20;
+            const weightLbs = parseFloat(document.getElementById('weight').value) || 180;
+            const heightFt = parseFloat(document.getElementById('height-ft').value) || 5;
+            const heightIn = parseFloat(document.getElementById('height-in').value) || 10;
+            const baseActivity = parseFloat(document.getElementById('daily-activity').value);
+            const trainingLoad = parseFloat(document.getElementById('training-freq').value);
+
+            const weightKg = weightLbs / 2.20462;
+            const heightCm = ((heightFt * 12) + heightIn) * 2.54;
+
+            let bmr = 0;
+            if (gender === 'male') {
+                bmr = 88.362 + (13.397 * weightKg) + (4.799 * heightCm) - (5.677 * age);
+            } else {
+                bmr = 447.593 + (9.247 * weightKg) + (3.098 * heightCm) - (4.330 * age);
+            }
+
+            const totalActivity = baseActivity + trainingLoad;
+            let tdee = Math.round(bmr * totalActivity);
+            if (currentSeason === 'pre') tdee = Math.round(tdee * 1.1);
+
+            let goalLabel = "MAINTENANCE";
+            let goalClass = "bg-blue-100 text-blue-700";
+            if (goal === 'loss') { tdee = Math.round(tdee * 0.85); goalLabel = "FAT LOSS (-15%)"; goalClass = "bg-red-100 text-red-700"; } 
+            else if (goal === 'gain') { tdee = Math.round(tdee * 1.10); goalLabel = "MUSCLE GAIN (+10%)"; goalClass = "bg-green-100 text-green-700"; }
+
+            const badge = document.getElementById('goal-badge');
+            if(badge) { badge.className = `absolute top-4 right-4 text-xs font-bold px-2 py-1 rounded ${goalClass}`; badge.textContent = goalLabel; }
+            document.getElementById('tdee-val').textContent = tdee;
+            document.getElementById('water-oz').textContent = Math.round(weightLbs / 2);
+
+            let proteinMult = goal === 'loss' ? 1.1 : 1.0;
+            const proteinGrams = Math.round(weightLbs * proteinMult);
+            let fatMult = (currentSeason === 'post' || currentSeason === 'off') ? 0.45 : 0.4;
+            const fatGrams = Math.round(weightLbs * fatMult);
+            let remainingCals = tdee - ((proteinGrams * 4) + (fatGrams * 9));
+            if(remainingCals < 0) remainingCals = 0; 
+            const carbGrams = Math.round(remainingCals / 4);
+
+            document.getElementById('protein-range').textContent = proteinGrams;
+            document.getElementById('fat-range').textContent = fatGrams;
+            document.getElementById('carb-range').textContent = carbGrams;
+
+            updateMacroChart(proteinGrams, fatGrams, carbGrams);
+            updateGroceryList(); 
+        }
+
+        function updateMacroChart(p, f, c) {
+            if (macroChartInstance) macroChartInstance.destroy();
+            const canvas = document.getElementById('macroChart');
+            if(!canvas) return;
+            const ctx = canvas.getContext('2d');
+            macroChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: { labels: ['Protein (g)', 'Fats (g)', 'Carbs (g)'], datasets: [{ data: [p, f, c], backgroundColor: ['#ef4444', '#f59e0b', '#22c55e'], borderWidth: 0 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' }, tooltip: commonTooltip } }
+            });
+        }
+
+        function updateGroceryList() {
+            const budgetEl = document.getElementById('budget-select');
+            const storeSelect = document.getElementById('store-select');
+            if(!budgetEl || !storeSelect) return;
+            const budget = budgetEl.value;
+            const currentStore = storeSelect.value;
+            storeSelect.innerHTML = ''; 
+            if(groceryData[budget]) {
+                const stores = Object.keys(groceryData[budget]);
+                stores.forEach(s => {
+                    const opt = document.createElement('option'); opt.value = s;
+                    let name = s.charAt(0).toUpperCase() + s.slice(1);
+                    if(s === 'dillons') name = 'Dillons / Kroger'; if(s === 'costco') name = 'Costco / Sam\'s Club';
+                    opt.textContent = name; storeSelect.appendChild(opt);
+                });
+                if (stores.includes(currentStore)) storeSelect.value = currentStore;
+            }
+            const selectedStore = storeSelect.value;
+            const goalData = goalAddons[currentGoal];
+            const alertBox = document.getElementById('list-goal-alert');
+            const alertText = document.getElementById('list-goal-text');
+            if(alertBox && goalData) {
+                alertText.innerHTML = `<strong>${goalData.label}:</strong> ${goalData.desc}`;
+                alertBox.className = "px-6 py-3 border-b flex items-center text-sm " + (currentGoal === 'loss' ? 'bg-red-50 text-red-800 border-red-100' : currentGoal === 'gain' ? 'bg-green-50 text-green-800 border-green-100' : 'bg-blue-50 text-blue-800 border-blue-100');
+            }
+            if(groceryData[budget] && groceryData[budget][selectedStore]) {
+                const data = groceryData[budget][selectedStore];
+                document.getElementById('list-title').textContent = data.title;
+                document.getElementById('list-cost').textContent = data.cost;
+                const renderItems = (items, id, isAddon = false) => {
+                    const ul = document.getElementById(id);
+                    if(!ul) return;
+                    if(!isAddon) ul.innerHTML = ''; 
+                    items.forEach(item => {
+                        const li = document.createElement('li'); li.className = "flex items-start";
+                        const bullet = isAddon ? '<i class="ph-fill ph-star text-orange-500 mr-2"></i>' : '<span class="mr-2 text-slate-400">•</span>';
+                        const textClass = isAddon ? 'font-bold text-orange-600' : '';
+                        li.innerHTML = `${bullet} <span class="${textClass}">${item}</span>`;
+                        ul.appendChild(li);
+                    });
+                };
+                renderItems(data.protein, 'protein-list');
+                renderItems(data.carbs, 'carb-list');
+                renderItems(data.other, 'other-list');
+                if(goalData.items.length > 0) renderItems(goalData.items, 'other-list', true);
+            }
+        }
+
+        function setPlate(type) {
+            ['pre', 'post', 'rest'].forEach(t => {
+                const btn = document.getElementById(`plate-btn-${t}`);
+                if (btn) { if (t === type) { btn.classList.remove('btn-outline'); btn.classList.add('btn-primary'); } else { btn.classList.add('btn-outline'); btn.classList.remove('btn-primary'); } }
+            });
+            const config = plateConfigs[type];
+            document.getElementById('plate-title').textContent = config.title;
+            document.getElementById('plate-desc').textContent = config.desc;
+            if (plateChartInstance) plateChartInstance.destroy();
+            const canvas = document.getElementById('plateChart');
+            if(!canvas) return;
+            const ctx = canvas.getContext('2d');
+            plateChartInstance = new Chart(ctx, {
+                type: 'pie',
+                data: { labels: ['Carbs', 'Protein', 'Fats/Veg'], datasets: [{ data: config.data, backgroundColor: ['#fcd34d', '#f87171', '#4ade80'], borderWidth: 2, borderColor: '#ffffff' }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' }, tooltip: commonTooltip } }
+            });
+        }
+
+        // --- Init ---
+        window.addEventListener('DOMContentLoaded', () => {
+            setSeason('pre');
+            updateTraining();
+            updateCalculator();
+            calculateDailyScore();
+            setPlate('pre');
+        });
+
+    </script>
+</body>
+</html>
